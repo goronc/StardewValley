@@ -1,50 +1,78 @@
 import pygame
-from game import Game
+import sys
 
+# Initialize Pygame
 pygame.init()
 
-# generer la fenetre du jeu
+# creation de la 
+taille = (1080, 720)
+window = pygame.display.set_mode(taille)
+pygame.display.set_caption('Cookie')
 
-pygame.display.set_caption("Mon premier jeu")
+# Create a font object
+font_boutton = pygame.font.Font(None, 24)
+font_cookie = pygame.font.Font(None, 24)
 
-screen = pygame.display.set_mode((1080,720))
+# Create a surface for the button
+boutton_surface = pygame.Surface((150, 50))
+nb_cookie_surface = pygame.Surface((150, 50))
 
-bg = pygame.image.load("assets/bg.jpg")
+# Ajouter du Text
+text_boutton = font_boutton.render("Click Me", True, (0, 0, 0))
+text_boutton_rect = text_boutton.get_rect(center=(boutton_surface.get_width()/2, boutton_surface.get_height()/2))
 
-game = Game()
+nb_cookie = 0
 
-running = True
-while running:
+text_cookie = font_cookie.render(str(nb_cookie), True, (255, 0, 0))
+text_cookie_rect = text_cookie.get_rect(center=(nb_cookie_surface.get_width()/2, nb_cookie_surface.get_height()/2))
 
-    screen.blit(bg, (0,-200))
 
-    screen.blit(game.player.image, game.player.rect)
 
-    pygame.display.flip()
 
-    print(game.player.rect.x , game.player.rect.y)
 
-    #mouvement du joueur
-    if game.pressed.get(pygame.K_z) and game.player.rect.y > 0:
-        game.player.moove_up()
-    elif game.pressed.get(pygame.K_q) and game.player.rect.x > 0:
-        game.player.moove_left()
-    elif game.pressed.get(pygame.K_s) and game.player.rect.y + game.player.rect.height < 720:
-        game.player.moove_down()
-    elif game.pressed.get(pygame.K_d) and game.player.rect.x + game.player.rect.width < 1080:
-        game.player.moove_right()
 
-    #detection des evenemets
+# Create a pygame.Rect object that represents the button's boundaries
+button_rect = pygame.Rect(125, 125, 150, 50)  # Adjust the position as needed
+
+while True:
+    # Couleur de fond
+    window.fill((155, 255, 155))
+
+    # Gestion des événements
     for event in pygame.event.get():
-        #femeture de fentre
+        # Quitter la fenêtre
         if event.type == pygame.QUIT:
-            running = False
-            pygame.quit
-            print(" la fenetre a été fermé")
-        #detecter input de touches
-        elif event.type == pygame.KEYDOWN:
-            game.pressed[event.key] = True
-        elif event.type == pygame.KEYUP:
-            game.pressed[event.key] = False
+            pygame.quit()
+            sys.exit()
 
+        # Si la souris est sur le bouton et clique
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if button_rect.collidepoint(event.pos):
+                nb_cookie += 1
+                # Mettre à jour le texte du nombre de cookies
+                text_cookie = font_cookie.render(str(nb_cookie), True, (255, 0, 0))
+                text_cookie_rect = text_cookie.get_rect(center=(nb_cookie_surface.get_width() / 2, nb_cookie_surface.get_height() / 2))
 
+    # Effet hover sur le bouton
+    if button_rect.collidepoint(pygame.mouse.get_pos()):
+        pygame.draw.rect(boutton_surface, (127, 255, 212), (1, 1, 148, 48))
+    else:
+        pygame.draw.rect(boutton_surface, (0, 0, 0), (0, 0, 150, 50))
+        pygame.draw.rect(boutton_surface, (255, 255, 255), (1, 1, 148, 48))
+        pygame.draw.rect(boutton_surface, (0, 0, 0), (1, 1, 148, 1), 2)
+        pygame.draw.rect(boutton_surface, (0, 100, 0), (1, 48, 148, 10), 2)
+
+    # Afficher le texte du bouton
+    boutton_surface.blit(text_boutton, text_boutton_rect)
+    # Afficher le bouton
+    window.blit(boutton_surface, (button_rect.x, button_rect.y))
+
+    # Effacer la surface du nombre de cookies avec la couleur de fond
+    nb_cookie_surface.fill((155, 255, 155))
+    # Afficher le texte du nombre de cookies
+    nb_cookie_surface.blit(text_cookie, text_cookie_rect)
+    # Afficher la surface du nombre de cookies
+    window.blit(nb_cookie_surface, (200, 200))
+
+    # Mettre à jour l'écran
+    pygame.display.update()
